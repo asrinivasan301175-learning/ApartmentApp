@@ -20,13 +20,15 @@ ApartmentMaintenance/
 ├── tests/
 │   └── ApartmentMaintenance.UnitTests/       # xUnit tests (Workflow, Password Hashing, JWT, DTO Validators)
 ├── client/                                   # React 19 + TypeScript + Material-UI (MUI) SPA
+├── docs/                                     # Architecture & Entity Relationship Diagrams (ERD)
+│   └── architecture_and_erd.md
 ├── docker-compose.yml                        # Production-ready multi-container orchestration
 ├── Dockerfile.api                            # Multi-stage .NET 10 Web API image
 ├── Dockerfile.client                         # Multi-stage Vite build + Nginx alpine reverse proxy
 └── .env.example                              # Environment configuration template
 ```
 
-For detailed Solution Architecture diagrams and Entity Relationship Diagrams (ERD), refer to the [Architecture and ERD Documentation](file:///C:/Users/ShreyaLap/.gemini/antigravity/brain/1f4f31a7-e4b3-4818-a86b-f829f02aef2d/architecture_and_erd.md).
+For detailed Solution Architecture diagrams and Entity Relationship Diagrams (ERD), refer to the [Architecture and ERD Documentation](./docs/architecture_and_erd.md).
 
 ---
 
