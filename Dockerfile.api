@@ -1,0 +1,30 @@
+# Multi-stage Dockerfile for ASP.NET Core 10 Web API
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /app
+
+# Copy csproj files and restore dependencies
+COPY ApartmentMaintenance.sln ./
+COPY src/ApartmentMaintenance.Domain/*.csproj ./src/ApartmentMaintenance.Domain/
+COPY src/ApartmentMaintenance.Application/*.csproj ./src/ApartmentMaintenance.Application/
+COPY src/ApartmentMaintenance.Infrastructure/*.csproj ./src/ApartmentMaintenance.Infrastructure/
+COPY src/ApartmentMaintenance.Api/*.csproj ./src/ApartmentMaintenance.Api/
+COPY tests/ApartmentMaintenance.UnitTests/*.csproj ./tests/ApartmentMaintenance.UnitTests/
+
+RUN dotnet restore
+
+# Copy all source files and publish
+COPY src/ ./src/
+COPY tests/ ./tests/
+WORKDIR /app/src/ApartmentMaintenance.Api
+RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false
+
+# Runtime Image
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+EXPOSE 5000
+ENV ASPNETCORE_URLS=http://+:5000
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+COPY --from=build /app/publish .
+
+ENTRYPOINT ["dotnet", "ApartmentMaintenance.Api.dll"]

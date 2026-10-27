@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    image: mysql:8.4
+    container_name: apartment-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword_secure_2026
+      MYSQL_DATABASE: ApartmentMaintenanceDb
+      MYSQL_USER: aptuser
+      MYSQL_PASSWORD: aptpassword_secure_2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: apartment-api
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DatabaseProvider=MySQL
+      - ConnectionStrings__DefaultConnection=Server=mysql-db;Port=3306;Database=ApartmentMaintenanceDb;Uid=aptuser;Pwd=aptpassword_secure_2026;CharSet=utf8mb4;
+      - Jwt__Key=APARTMENT_MAINTENANCE_SUPER_SECURE_JWT_SECRET_KEY_2026_MIN_32_BYTES_REQUIRED!
+      - Jwt__Issuer=ApartmentMaintenanceApi
+      - Jwt__Audience=ApartmentMaintenanceClient
+      - CorsOrigins=http://localhost;http://localhost:3000;http://localhost:5173
+    ports:
+      - "5000:5000"
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    container_name: apartment-client
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  mysql_data:
+    driver: local
